@@ -29,24 +29,27 @@ namespace RedeSocialWEB.Controllers
             List<Usuario> unfiltered = new List<Usuario>();
             List<Usuario> filtered = new List<Usuario>();
 
-            using (var httpClient = new HttpClient())
+            if (User.Identity.IsAuthenticated)
             {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"))
+                using (var httpClient = new HttpClient())
                 {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    unfiltered = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
+                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        unfiltered = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
+                    }
+                }
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/" + User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        filtered = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
+                    }
+
                 }
                 listaUsers.UnfilteredUsers = unfiltered;
-            }
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/" + User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    filtered = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
-                }
                 listaUsers.FilteredUsers = filtered;
-
             }
             return View(listaUsers);
         }

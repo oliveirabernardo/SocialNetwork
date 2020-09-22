@@ -35,45 +35,56 @@ namespace RedeSocialWEB.Controllers
             List<Usuario> userList = new List<Usuario>();
 
             List<Postagem> postagens = new List<Postagem>();
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Postagens/"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    postagens = JsonConvert.DeserializeObject<List<Postagem>>(apiResponse);
-                }
-            }
 
-            List<Guid> seguindo = new List<Guid>();
-            using (var httpClient = new HttpClient())
+            if (User.Identity.IsAuthenticated)
             {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/" + Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                using (var httpClient = new HttpClient())
                 {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
-                    foreach (Usuario user in usuarios)
+                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Postagens/"))
                     {
-                        seguindo.Add(Guid.Parse(user.Id));
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            postagens = JsonConvert.DeserializeObject<List<Postagem>>(apiResponse);
+                        }
+                        catch (Exception)
+                        {
+                            return BadRequest();
+                        }
                     }
                 }
-            }
 
-            foreach (Postagem post in postagens)
-            {
-                if (post.UsuarioId.Equals(Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)) || seguindo.Contains(post.UsuarioId))
+                List<Guid> seguindo = new List<Guid>();
+                using (var httpClient = new HttpClient())
                 {
-                    postsVisiveis.Add(post);
+                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/" + Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
+                        foreach (Usuario user in usuarios)
+                        {
+                            seguindo.Add(Guid.Parse(user.Id));
+                        }
+                    }
+                }
+
+                foreach (Postagem post in postagens)
+                {
+                    if (post.UsuarioId.Equals(Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)) || seguindo.Contains(post.UsuarioId))
+                    {
+                        postsVisiveis.Add(post);
+                    }
+                }
+
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        userList = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
+                    }
                 }
                 postsCompletos.VisiblePosts = postsVisiveis;
-            }
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    userList = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
-                }
                 postsCompletos.PostsOwner = userList;
             }
 
