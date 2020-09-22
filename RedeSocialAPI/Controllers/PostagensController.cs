@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +84,7 @@ namespace RedeSocialAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Postagem>> PostPostagem(Postagem postagem)
         {
-            if (postagem.EmailUsuario == null) { postagem.EmailUsuario = User.Identity.Name; }
+            if (postagem.UsuarioId == null) { postagem.UsuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value); }
             postagem.Id = Guid.NewGuid();
             postagem.HoraPostagem = DateTime.Now;
             _context.Postagens.Add(postagem);

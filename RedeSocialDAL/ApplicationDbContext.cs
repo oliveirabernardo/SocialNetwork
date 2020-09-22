@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RedeSocialBLL.Models;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace RedeSocialDAL
@@ -13,5 +14,7 @@ namespace RedeSocialDAL
             : base(options)
         {
         }
+
+        public DbSet<Seguindo> Seguindo { get; set; }
     }
 }

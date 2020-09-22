@@ -1,4 +1,6 @@
-﻿@model IEnumerable<RedeSocialBLL.Models.Postagem>
+﻿@using System.Security.Claims;
+@using RedeSocialBLL.Models;
+@model RedeSocialWEB.Controllers.PostagensController.PostagensCompletas
 
 @{
     ViewData["Title"] = "Index";
@@ -6,30 +8,30 @@
 
 @if (User.Identity.Name != null)
 {
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
 }
 
 <table class="table">
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.VisiblePosts)
         {
+            Usuario op = Model.PostsOwner.First(o => o.Id.Equals(item.UsuarioId.ToString()));
+            string nomeCompleto = op.PrimeiroNome + " " + op.UltimoNome;
             <tr>
                 <td>
-                    <strong>@Html.DisplayFor(modelItem => item.EmailUsuario)</strong>
+                    <img src="@item.URLImagem" style="max-width:900px; height:auto" />
                     <br />
-                    <img src="@item.URLImagem" style="max-width:350px; height:auto" />
-                    <br />
-                    @Html.DisplayFor(modelItem => item.Mensagem)
+                    <p><strong>@nomeCompleto:  </strong> @Html.DisplayFor(modelItem => item.Mensagem)</p>
                     <br />
                     @Html.DisplayFor(modelItem => item.HoraPostagem)
-                    @if (item.EmailUsuario == User.Identity.Name)
+                    @if (item.UsuarioId == Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                     {
                         <span>
                             <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                             <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
                         </span>
                     }
                 </td>
@@ -37,3 +39,9 @@
         }
     </tbody>
 </table>
+
+<style>
+    .table{
+        margin: 0 auto;
+    }
+</style>

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RedeSocialBLL.Models;
 using RedeSocialDAL;
@@ -17,9 +19,21 @@ namespace RedeSocialWEB.Controllers
     public class PostagensController : Controller
     {
 
+        public class PostagensCompletas
+        {
+            public List<Postagem> VisiblePosts { get; set; }
+
+            public List<Usuario> PostsOwner { get; set; }
+        }
+
+
         // GET: Postagens
         public async Task<IActionResult> Index()
         {
+            PostagensCompletas postsCompletos = new PostagensCompletas();
+            List<Postagem> postsVisiveis = new List<Postagem>();
+            List<Usuario> userList = new List<Usuario>();
+
             List<Postagem> postagens = new List<Postagem>();
             using (var httpClient = new HttpClient())
             {
@@ -29,7 +43,42 @@ namespace RedeSocialWEB.Controllers
                     postagens = JsonConvert.DeserializeObject<List<Postagem>>(apiResponse);
                 }
             }
-            return View(postagens);
+
+            List<Guid> seguindo = new List<Guid>();
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/" + Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
+                    foreach (Usuario user in usuarios)
+                    {
+                        seguindo.Add(Guid.Parse(user.Id));
+                    }
+                }
+            }
+
+            foreach (Postagem post in postagens)
+            {
+                if (post.UsuarioId.Equals(Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)) || seguindo.Contains(post.UsuarioId))
+                {
+                    postsVisiveis.Add(post);
+                }
+                postsCompletos.VisiblePosts = postsVisiveis;
+            }
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    userList = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
+                }
+                postsCompletos.PostsOwner = userList;
+            }
+
+
+            return View(postsCompletos);
         }
 
         // GET: Postagens/Details/5
@@ -65,7 +114,7 @@ namespace RedeSocialWEB.Controllers
             {
                 using (var httpClient = new HttpClient()) {
 
-                    postagem.EmailUsuario = User.Identity.Name;
+                    postagem.UsuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
                     StringContent content = new StringContent(JsonConvert.SerializeObject(postagem), Encoding.UTF8, "application/json");
 
                     using (var response = await httpClient.PostAsync("https://localhost:44370/api/Postagens/", content))
@@ -76,7 +125,7 @@ namespace RedeSocialWEB.Controllers
 
                 }
             }
-            return View(novaPostagem);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Postagens/Edit/5
@@ -99,7 +148,7 @@ namespace RedeSocialWEB.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("EmailUsuario,Mensagem,URLImagem,HoraPostagem,Id")] Postagem postagem)
+        public async Task<IActionResult> Edit(Guid id, [Bind("UsuarioId,Mensagem,URLImagem,HoraPostagem,Id")] Postagem postagem)
         {
             if (id != postagem.Id)
             {
@@ -153,6 +202,21 @@ namespace RedeSocialWEB.Controllers
                     string apiResponse = await response.Content.ReadAsStringAsync();
                 }
 
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Seguir(Guid? id)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                StringContent content = new StringContent(JsonConvert.SerializeObject(Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)), Encoding.UTF8, "application/json");
+
+                using (var response = await httpClient.PostAsync("https://localhost:44370/api/Seguidor/"+id, content))
+                {
+                    Ok();
+                }
             }
             return RedirectToAction(nameof(Index));
         }

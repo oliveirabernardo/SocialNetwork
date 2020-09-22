@@ -154,6 +154,28 @@ namespace RedeSocialDAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("RedeSocialBLL.Models.Seguindo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SegueId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UsuarioId1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId1");
+
+                    b.ToTable("Seguindo");
+                });
+
             modelBuilder.Entity("RedeSocialBLL.Models.Usuario", b =>
                 {
                     b.Property<string>("Id")
@@ -279,6 +301,13 @@ namespace RedeSocialDAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RedeSocialBLL.Models.Seguindo", b =>
+                {
+                    b.HasOne("RedeSocialBLL.Models.Usuario", null)
+                        .WithMany("SeguindoUsuarios")
+                        .HasForeignKey("UsuarioId1");
                 });
 #pragma warning restore 612, 618
         }

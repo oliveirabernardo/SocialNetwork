@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace RedeSocialDAL.Migrations
 {
-    public partial class CustomIdentity1 : Migration
+    public partial class Identity1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,9 +40,8 @@ namespace RedeSocialDAL.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    PrimeiroNome = table.Column<string>(nullable: true),
-                    UltimoNome = table.Column<string>(nullable: true),
-                    Registrado = table.Column<DateTime>(nullable: false),
+                    PrimeiroNome = table.Column<string>(nullable: false),
+                    UltimoNome = table.Column<string>(nullable: false),
                     Aniversario = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -156,6 +155,26 @@ namespace RedeSocialDAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Seguindo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    UsuarioId = table.Column<Guid>(nullable: false),
+                    SegueId = table.Column<Guid>(nullable: false),
+                    UsuarioId1 = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Seguindo", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Seguindo_AspNetUsers_UsuarioId1",
+                        column: x => x.UsuarioId1,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -194,6 +213,11 @@ namespace RedeSocialDAL.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Seguindo_UsuarioId1",
+                table: "Seguindo",
+                column: "UsuarioId1");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -212,6 +236,9 @@ namespace RedeSocialDAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Seguindo");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

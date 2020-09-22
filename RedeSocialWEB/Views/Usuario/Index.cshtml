@@ -1,0 +1,34 @@
+﻿@using System.Security.Claims;
+@using RedeSocialBLL.Models;
+@model RedeSocialWEB.Controllers.UsuarioController.UserLists
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<table class="table">
+    <tbody>
+        @foreach (var item in Model.UnfilteredUsers)
+        {
+            @if (item.Id != User.FindFirst(ClaimTypes.NameIdentifier).Value)
+            {
+                <tr>
+                    <td>
+                        <span>
+                            <strong>@Html.DisplayFor(modelItem => item.PrimeiroNome) @Html.DisplayFor(modelItem => item.UltimoNome)</strong> |
+                            @if (Model.FilteredUsers.Any(u => u.Id == item.Id))
+                            {
+                                <a asp-action="Unfollow" asp-route-id="@item.Id">Deixar de seguir</a>
+                            }
+                            else
+                            {
+
+                                <a asp-action="Seguir" asp-route-id="@item.Id">Seguir</a>
+                            }
+                        </span>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

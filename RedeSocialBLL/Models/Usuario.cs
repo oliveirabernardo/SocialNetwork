@@ -3,6 +3,7 @@ using RedeSocialBLL.Models.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace RedeSocialBLL.Models
@@ -15,5 +16,6 @@ namespace RedeSocialBLL.Models
         public string UltimoNome { get; set; }
         [Required]
         public DateTime Aniversario { get; set; }
+        public ICollection<Seguindo> SeguindoUsuarios { get; set; }
     }
 }

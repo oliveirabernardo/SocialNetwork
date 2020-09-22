@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RedeSocialDAL;
 
 namespace RedeSocialDAL.Migrations.RedeSocial
 {
     [DbContext(typeof(RedeSocialContext))]
-    partial class RedeSocialContextModelSnapshot : ModelSnapshot
+    [Migration("20200922133343_Postagem1")]
+    partial class Postagem1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

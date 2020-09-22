@@ -20,7 +20,12 @@
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Postagens" asp-action="Index">Home</a>
+                            <form asp-controller="Usuario" asp-action="Index" class="nav-item">
+                                <p>
+                                    <input type="text" name="SearchString">
+                                    <input type="submit" value="Pesquisar" />
+                                </p>
+                            </form>
                         </li>
                     </ul>
                 </div>
