@@ -40,7 +40,7 @@ namespace RedeSocialWEB.Controllers
             {
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Postagens/"))
+                    using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/"))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         try
@@ -57,7 +57,7 @@ namespace RedeSocialWEB.Controllers
                 List<Guid> seguindo = new List<Guid>();
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/" + Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                    using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/" + Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
@@ -78,7 +78,7 @@ namespace RedeSocialWEB.Controllers
 
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"))
+                    using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/"))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         userList = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
@@ -98,7 +98,7 @@ namespace RedeSocialWEB.Controllers
             Postagem postagem = new Postagem();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Postagens/"+id))
+                using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/" + id))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     postagem = JsonConvert.DeserializeObject<Postagem>(apiResponse);
@@ -128,7 +128,7 @@ namespace RedeSocialWEB.Controllers
                     postagem.UsuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
                     StringContent content = new StringContent(JsonConvert.SerializeObject(postagem), Encoding.UTF8, "application/json");
 
-                    using (var response = await httpClient.PostAsync("https://localhost:44370/api/Postagens/", content))
+                    using (var response = await httpClient.PostAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/", content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         novaPostagem = JsonConvert.DeserializeObject<Postagem>(apiResponse);
@@ -145,7 +145,7 @@ namespace RedeSocialWEB.Controllers
             Postagem postagem = new Postagem();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Postagens/" + id))
+                using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/" + id))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     postagem = JsonConvert.DeserializeObject<Postagem>(apiResponse);
@@ -174,7 +174,7 @@ namespace RedeSocialWEB.Controllers
 
                     StringContent content = new StringContent(JsonConvert.SerializeObject(postagem), Encoding.UTF8, "application/json");
 
-                    using (var response = await httpClient.PutAsync("https://localhost:44370/api/Postagens/"+id, content))
+                    using (var response = await httpClient.PutAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/" + id, content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         editarPostagem = JsonConvert.DeserializeObject<Postagem>(apiResponse);
@@ -192,7 +192,7 @@ namespace RedeSocialWEB.Controllers
             Postagem postagem = new Postagem();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Postagens/" + id))
+                using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/" + id))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     postagem = JsonConvert.DeserializeObject<Postagem>(apiResponse);
@@ -208,7 +208,7 @@ namespace RedeSocialWEB.Controllers
         {
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.DeleteAsync("https://localhost:44370/api/Postagens/" + id))
+                using (var response = await httpClient.DeleteAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/" + id))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                 }
@@ -224,7 +224,7 @@ namespace RedeSocialWEB.Controllers
             {
                 StringContent content = new StringContent(JsonConvert.SerializeObject(Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)), Encoding.UTF8, "application/json");
 
-                using (var response = await httpClient.PostAsync("https://localhost:44370/api/Seguidor/"+id, content))
+                using (var response = await httpClient.PostAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/" + id, content))
                 {
                     Ok();
                 }

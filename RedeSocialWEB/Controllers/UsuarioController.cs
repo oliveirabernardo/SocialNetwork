@@ -33,7 +33,7 @@ namespace RedeSocialWEB.Controllers
             {
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"))
+                    using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/"))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         unfiltered = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
@@ -41,7 +41,7 @@ namespace RedeSocialWEB.Controllers
                 }
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/" + User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                    using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/" + User.FindFirst(ClaimTypes.NameIdentifier).Value))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         filtered = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
@@ -59,7 +59,7 @@ namespace RedeSocialWEB.Controllers
             List<Usuario> usuarios = new List<Usuario>();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Seguidor/"+id))
+                using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/" + id))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     usuarios = JsonConvert.DeserializeObject<List<Usuario>>(apiResponse);
@@ -77,7 +77,7 @@ namespace RedeSocialWEB.Controllers
             {
                 StringContent content = new StringContent(JsonConvert.SerializeObject(Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)), Encoding.UTF8, "application/json");
 
-                using (var response = await httpClient.PostAsync("https://localhost:44370/api/Seguidor/" + id, content))
+                using (var response = await httpClient.PostAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/" + id, content))
                 {
                     Ok();
                 }
@@ -92,7 +92,7 @@ namespace RedeSocialWEB.Controllers
             {
                 String identifier = id + "|" + User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                using (var response = await httpClient.DeleteAsync("https://localhost:44370/api/Seguidor/" + identifier))
+                using (var response = await httpClient.DeleteAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Seguidor/" + identifier))
                 {
                     Ok();
                 }

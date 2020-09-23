@@ -83,7 +83,7 @@ namespace RedeSocialWEB.Areas.Identity.Pages.Account.Manage
             List<Postagem> postagens = new List<Postagem>();
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync("https://localhost:44370/api/Postagens/"))
+                using (var response = await httpClient.GetAsync("https://redesocialweb20200923161434.azurewebsites.net/api/Postagens/"))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     postagens = JsonConvert.DeserializeObject<List<Postagem>>(apiResponse);

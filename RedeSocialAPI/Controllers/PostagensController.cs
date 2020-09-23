@@ -7,6 +7,7 @@ using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using RedeSocialBLL.Models;
 using RedeSocialDAL;
@@ -29,53 +30,39 @@ namespace RedeSocialAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Postagem>>> GetPostagens()
         {
-            return await _context.Postagens.ToListAsync();
+            return await _context.Postagens.FromSqlRaw("EXEC GetPostagens").ToListAsync<Postagem>();
         }
 
         // GET: api/Postagens/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Postagem>> GetPostagem(Guid id)
         {
-            var postagem = await _context.Postagens.FindAsync(id);
+            var postagem = await _context.Postagens.FromSqlRaw("EXEC dbo.GetPostagem @Id", new SqlParameter("@Id", id)).ToListAsync();
 
             if (postagem == null)
             {
                 return NotFound();
             }
 
-            return postagem;
+            return postagem.First();
         }
 
         // PUT: api/Postagens/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPostagem(Guid id, Postagem postagem)
+        public async Task<ActionResult<Postagem>> PutPostagem(Guid id, Postagem postagem)
         {
-            if (id != postagem.Id)
-            {
-                return BadRequest();
-            }
+            postagem.Id = id;
+            _context.Database.ExecuteSqlRaw("EXEC dbo.UpdatePostagem @Id, @UsuarioId, @Mensagem, @URLImagem, @HoraPostagem",
+            new SqlParameter("@Id", postagem.Id),
+            new SqlParameter("@UsuarioId", postagem.UsuarioId),
+            new SqlParameter("@Mensagem", postagem.Mensagem),
+            new SqlParameter("@URLImagem", postagem.URLImagem),
+            new SqlParameter("@HoraPostagem", postagem.HoraPostagem)
+            );
 
-            _context.Entry(postagem).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PostagemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return postagem;
         }
 
         // POST: api/Postagens
@@ -87,8 +74,14 @@ namespace RedeSocialAPI.Controllers
             if (postagem.UsuarioId == null) { postagem.UsuarioId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value); }
             postagem.Id = Guid.NewGuid();
             postagem.HoraPostagem = DateTime.Now;
-            _context.Postagens.Add(postagem);
-            await _context.SaveChangesAsync();
+
+            _context.Database.ExecuteSqlRaw("EXEC dbo.PostPostagem @Id, @UsuarioId, @Mensagem, @URLImagem, @HoraPostagem",
+            new SqlParameter("@Id", postagem.Id),
+            new SqlParameter("@UsuarioId", postagem.UsuarioId),
+            new SqlParameter("@Mensagem", postagem.Mensagem),
+            new SqlParameter("@URLImagem", postagem.URLImagem),
+            new SqlParameter("@HoraPostagem", postagem.HoraPostagem)
+ );
 
             return CreatedAtAction("GetPostagem", new { id = postagem.Id }, postagem);
         }
@@ -97,21 +90,16 @@ namespace RedeSocialAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Postagem>> DeletePostagem(Guid id)
         {
-            var postagem = await _context.Postagens.FindAsync(id);
+            var postagem = await _context.Postagens.FromSqlRaw("EXEC dbo.GetPostagem @Id", new SqlParameter("@Id", id)).ToListAsync();
             if (postagem == null)
             {
                 return NotFound();
             }
 
-            _context.Postagens.Remove(postagem);
-            await _context.SaveChangesAsync();
+            _context.Database.ExecuteSqlRaw("EXEC dbo.DeletePostagem @Id", new SqlParameter("@Id", id));
 
-            return postagem;
+            return postagem.First();
         }
 
-        private bool PostagemExists(Guid id)
-        {
-            return _context.Postagens.Any(e => e.Id == id);
-        }
     }
 }
